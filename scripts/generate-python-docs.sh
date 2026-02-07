@@ -28,8 +28,14 @@ OUTPUT_DIR="$ROOT_DIR/docs/api/python"
 echo "Generating Python API documentation..."
 echo "Output directory: $OUTPUT_DIR"
 
-# Ensure pydoc-markdown is available
-if ! command -v pydoc-markdown &>/dev/null; then
+# Resolve pydoc-markdown command (CLI or Python module fallback)
+if command -v pydoc-markdown &>/dev/null; then
+  PYDOC_MD="pydoc-markdown"
+elif python3 -m pydoc_markdown --help &>/dev/null 2>&1; then
+  PYDOC_MD="python3 -m pydoc_markdown"
+elif python -m pydoc_markdown --help &>/dev/null 2>&1; then
+  PYDOC_MD="python -m pydoc_markdown"
+else
   echo "Error: pydoc-markdown not found. Install with: pip install pydoc-markdown" >&2
   exit 1
 fi
@@ -41,4 +47,4 @@ mkdir -p "$OUTPUT_DIR"
 cd "$ROOT_DIR"
 
 # Generate markdown for qumat module
-pydoc-markdown -I qumat -m qumat > "$OUTPUT_DIR/index.md"
+$PYDOC_MD -I qumat -m qumat > "$OUTPUT_DIR/index.md"
