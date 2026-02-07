@@ -5,8 +5,9 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "sync": "node scripts/sync-docs.js",
-    "start": "npm run sync && docusaurus start",
-    "prebuild": "npm run sync",
+    "generate-docs": "bash ../scripts/generate-python-docs.sh && bash ../scripts/generate-rust-docs.sh",
+    "start": "npm run sync && npm run generate-docs && docusaurus start",
+    "prebuild": "npm run sync && npm run generate-docs",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",

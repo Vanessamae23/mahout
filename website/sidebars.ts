@@ -109,7 +109,6 @@ const sidebars: SidebarsConfig = {
       collapsed: true,
       items: [
         'about/how-to-contribute',
-        'about/documenting-api',
       ],
     },
     {
