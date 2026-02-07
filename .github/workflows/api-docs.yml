@@ -47,21 +47,15 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install pdoc
-          pip install -e .
+        run: pip install pydoc-markdown
 
       - name: Generate Python API documentation
-        run: |
-          pdoc --output-dir docs/api/python \
-               --docformat restructuredtext \
-               qumat
+        run: ./scripts/generate-python-docs.sh
 
       - name: Verify generated docs
         run: |
-          test -d docs/api/python/qumat
+          test -f docs/api/python/index.md
           echo "Python docs generated successfully"
-          ls -la docs/api/python/
 
       - name: Upload Python API docs artifact
         uses: actions/upload-artifact@v4
@@ -77,29 +71,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
 
-      - name: Generate Rust documentation
-        working-directory: qdp
-        run: |
-          cargo doc --no-deps --package qdp-core 2>&1 | tee rustdoc-output.txt
-          # Check for documentation generation errors
-          if grep -q "error\[" rustdoc-output.txt; then
-            echo "Rust documentation generation failed with errors"
-            exit 1
-          fi
+      - name: Install rustdoc-md
+        run: cargo install rustdoc-md
+
+      - name: Generate Rust API documentation
+        run: ./scripts/generate-rust-docs.sh
 
       - name: Verify generated docs
         run: |
-          test -f qdp/target/doc/qdp_core/index.html
+          test -f docs/api/rust/index.md
           echo "Rust docs generated successfully"
 
       - name: Upload Rust API docs artifact
         uses: actions/upload-artifact@v4
         with:
           name: rust-api-docs
-          path: qdp/target/doc/
+          path: docs/api/rust/
           retention-days: 7
 
   verify-website-integration:
@@ -120,7 +110,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: rust-api-docs
-          path: website/static/api/rust/
+          path: docs/api/rust/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -139,5 +129,6 @@ jobs:
 
       - name: Verify API docs in build
         run: |
-          test -d website/build/api/rust/qdp_core
+          test -f website/build/docs/api/python/index.html
+          test -f website/build/docs/api/rust/index.html
           echo "Website built successfully with API docs integrated"
