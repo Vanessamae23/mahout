@@ -16,23 +16,23 @@
 #
 name: API Documentation
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'qumat/**'
-      - 'qdp/qdp-core/**'
-      - 'scripts/generate-*-docs.sh'
-      - '.github/workflows/api-docs.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'qumat/**'
-      - 'qdp/qdp-core/**'
-      - 'scripts/generate-*-docs.sh'
-      - '.github/workflows/api-docs.yml'
-  workflow_dispatch:
-
+# on:
+#   push:
+#     branches: [main]
+#     paths:
+#       - 'qumat/**'
+#       - 'qdp/qdp-core/**'
+#       - 'scripts/generate-*-docs.sh'
+#       - '.github/workflows/api-docs.yml'
+#   pull_request:
+#     branches: [main]
+#     paths:
+#       - 'qumat/**'
+#       - 'qdp/qdp-core/**'
+#       - 'scripts/generate-*-docs.sh'
+#       - '.github/workflows/api-docs.yml'
+#   workflow_dispatch:
+on: [push]
 jobs:
   python-docs:
     name: Generate Python API Docs
