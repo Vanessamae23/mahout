@@ -20,16 +20,21 @@ on:
   push:
     branches: [main]
     paths:
-      - 'qumat/**'
-      - 'qdp/qdp-core/**'
-      - 'scripts/generate-*-docs.sh'
-      - '.github/workflows/api-docs.yml'
-  workflow_dispatch:
-
+      - 'website/**'
+      - 'docs/**'
+      - 'qumat/**'                  # Added: Python source
+      - 'qdp/qdp-core/**'           # Added: Rust core
+      - 'scripts/generate-*-docs.sh' # Added: Doc scripts
+      - '.github/workflows/**'      # Added: Workflow changes
+  workflow_dispatch: # Allow manual trigger from GitHub UI
 jobs:
   generate-and-commit-docs:
     name: Generate & Commit API Docs
     runs-on: ubuntu-latest
+    # Added a conditional check so this job ONLY runs if code changed
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'dependencies') ||
+      any(github.event.pull_request.changed_files, 'qumat/**', 'qdp/qdp-core/**', 'scripts/**')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
