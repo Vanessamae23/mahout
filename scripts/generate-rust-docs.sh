@@ -62,7 +62,7 @@ fi
 NIGHTLY_BIN="$(dirname "$NIGHTLY_CARGO")"
 echo "Using nightly toolchain at: $NIGHTLY_BIN"
 echo "Generating rustdoc JSON..."
-PATH="$NIGHTLY_BIN:$PATH" RUSTDOCFLAGS="-Z unstable-options --output-format json" \
+PATH="$NIGHTLY_BIN:$PATH" RUSTDOCFLAGS="-Z unstable-options --output-format json -Awarnings" \
   cargo doc --no-deps --package qdp-core
 
 # Step 2: Convert JSON to Markdown
