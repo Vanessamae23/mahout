@@ -31,9 +31,9 @@ echo "Output directory: $OUTPUT_DIR"
 # Resolve pydoc-markdown command (CLI or Python module fallback)
 if command -v pydoc-markdown &>/dev/null; then
   PYDOC_MD="pydoc-markdown"
-elif python3 -m pydoc_markdown --help &>/dev/null 2>&1; then
+elif python3 -c "import pydoc_markdown" &>/dev/null 2>&1; then
   PYDOC_MD="python3 -m pydoc_markdown"
-elif python -m pydoc_markdown --help &>/dev/null 2>&1; then
+elif python -c "import pydoc_markdown" &>/dev/null 2>&1; then
   PYDOC_MD="python -m pydoc_markdown"
 else
   echo "Error: pydoc-markdown not found. Install with: pip install pydoc-markdown" >&2

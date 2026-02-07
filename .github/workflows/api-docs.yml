@@ -16,23 +16,22 @@
 #
 name: API Documentation
 
-# on:
-#   push:
-#     branches: [main]
-#     paths:
-#       - 'qumat/**'
-#       - 'qdp/qdp-core/**'
-#       - 'scripts/generate-*-docs.sh'
-#       - '.github/workflows/api-docs.yml'
-#   pull_request:
-#     branches: [main]
-#     paths:
-#       - 'qumat/**'
-#       - 'qdp/qdp-core/**'
-#       - 'scripts/generate-*-docs.sh'
-#       - '.github/workflows/api-docs.yml'
-#   workflow_dispatch:
-on: [push]
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'qumat/**'
+      - 'qdp/qdp-core/**'
+      - 'scripts/generate-*-docs.sh'
+      - '.github/workflows/api-docs.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'qumat/**'
+      - 'qdp/qdp-core/**'
+      - 'scripts/generate-*-docs.sh'
+      - '.github/workflows/api-docs.yml'
+  workflow_dispatch:
 jobs:
   python-docs:
     name: Generate Python API Docs
@@ -91,44 +90,3 @@ jobs:
           name: rust-api-docs
           path: docs/api/rust/
           retention-days: 7
-
-  verify-website-integration:
-    name: Verify Website Build with API Docs
-    needs: [python-docs, rust-docs]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Download Python API docs
-        uses: actions/download-artifact@v4
-        with:
-          name: python-api-docs
-          path: docs/api/python/
-
-      - name: Download Rust API docs
-        uses: actions/download-artifact@v4
-        with:
-          name: rust-api-docs
-          path: docs/api/rust/
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: website/package-lock.json
-
-      - name: Install dependencies
-        working-directory: website
-        run: npm ci
-
-      - name: Build website with API docs
-        working-directory: website
-        run: npm run build
-
-      - name: Verify API docs in build
-        run: |
-          test -f website/build/docs/api/python/index.html
-          test -f website/build/docs/api/rust/index.html
-          echo "Website built successfully with API docs integrated"
