@@ -24,17 +24,11 @@ on:
       - 'qdp/qdp-core/**'
       - 'scripts/generate-*-docs.sh'
       - '.github/workflows/api-docs.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'qumat/**'
-      - 'qdp/qdp-core/**'
-      - 'scripts/generate-*-docs.sh'
-      - '.github/workflows/api-docs.yml'
   workflow_dispatch:
+
 jobs:
-  python-docs:
-    name: Generate Python API Docs
+  generate-and-commit-docs:
+    name: Generate & Commit API Docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -45,48 +39,24 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install pydoc-markdown
-
-      - name: Generate Python API documentation
-        run: ./scripts/generate-python-docs.sh
-
-      - name: Verify generated docs
-        run: |
-          test -f docs/api/python/index.md
-          echo "Python docs generated successfully"
-
-      - name: Upload Python API docs artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-api-docs
-          path: docs/api/python/
-          retention-days: 7
-
-  rust-docs:
-    name: Generate Rust API Docs
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
       - name: Setup Rust nightly
         uses: dtolnay/rust-toolchain@nightly
 
-      - name: Install rustdoc-md
-        run: cargo install rustdoc-md
+      - name: Install tools
+        run: |
+          pip install pydoc-markdown
+          cargo install rustdoc-md
 
-      - name: Generate Rust API documentation
+      - name: Generate Python API docs
+        run: ./scripts/generate-python-docs.sh
+
+      - name: Generate Rust API docs
         run: ./scripts/generate-rust-docs.sh
 
-      - name: Verify generated docs
+      - name: Commit updated docs
         run: |
-          test -f docs/api/rust/index.md
-          echo "Rust docs generated successfully"
-
-      - name: Upload Rust API docs artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: rust-api-docs
-          path: docs/api/rust/
-          retention-days: 7
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/api/python/index.md docs/api/rust/index.md
+          git diff --cached --quiet || git commit -m "docs: auto-generate API documentation"
+          git push
