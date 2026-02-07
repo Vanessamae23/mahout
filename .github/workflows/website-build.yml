@@ -22,12 +22,19 @@ on:
     paths:
       - 'website/**'
       - 'docs/**'
-      - '.github/workflows/website-build.yml'
+      - 'qumat/**'                  # Added: Python source
+      - 'qdp/qdp-core/**'           # Added: Rust core
+      - 'scripts/generate-*-docs.sh' # Added: Doc scripts
+      - '.github/workflows/**'      # Added: Workflow changes
 
 jobs:
   generate-and-commit-docs:
     name: Generate & Commit API Docs
     runs-on: ubuntu-latest
+    # Added a conditional check so this job ONLY runs if code changed
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'dependencies') ||
+      any(github.event.pull_request.changed_files, 'qumat/**', 'qdp/qdp-core/**', 'scripts/**')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
