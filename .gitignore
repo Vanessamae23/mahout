@@ -35,6 +35,10 @@ website/.sass-cache
 
 # Docusaurus build artifacts (synced from /docs)
 website/blog/
+website/docs/
+website/node_modules/
+website/build/
+website/.docusaurus/
 website-new/
 
 *.iml

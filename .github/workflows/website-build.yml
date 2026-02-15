@@ -22,10 +22,74 @@ on:
     paths:
       - 'website/**'
       - 'docs/**'
-      - '.github/workflows/website-build.yml'
+      - 'qumat/**'                  # Added: Python source
+      - 'qdp/qdp-core/**'           # Added: Rust core
+      - 'scripts/generate-*-docs.sh' # Added: Doc scripts
+      - '.github/workflows/**'      # Added: Workflow changes
 
 jobs:
+  generate-and-commit-docs:
+    name: Generate & Commit API Docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necessary to track changed files
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Check for Code Changes
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            qumat/**
+            qdp/qdp-core/**
+            scripts/generate-*-docs.sh
+
+      - name: Run Doc Generation
+        # Only runs if the files defined above were modified
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Source code changed. Generating docs..."
+          # Your existing Python/Rust setup and script execution here
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install tools
+        run: |
+          pip install pydoc-markdown
+          cargo install rustdoc-md
+
+      - name: Generate Python API docs
+        run: ./scripts/generate-python-docs.sh
+
+      - name: Generate Rust API docs
+        run: ./scripts/generate-rust-docs.sh
+
+      - name: Commit updated docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/api/python/index.md docs/api/rust/index.md
+          
+          # Only commit and push if there are actual changes
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: auto-generate API documentation"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          else
+            echo "No changes to commit"
+          fi
   build:
+    needs: generate-and-commit-docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

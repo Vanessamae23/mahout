@@ -27,6 +27,7 @@ dependencies = [
     "cirq>=1.5.0,<1.6.0",
     "amazon-braket-sdk>=1.108.0,<2.0",
     "sympy>=1.14.0,<2.0",
+    "pydoc-markdown>=4.8.2",
 ]
 
 [project.optional-dependencies]
@@ -43,6 +44,7 @@ dev = [
     "numpy>=1.24,<2.0",
     "setuptools>=80.9.0",
     "tensorflow>=2.20",
+    "pdoc>=15.0.0",
 ]
 
 [tool.uv]
